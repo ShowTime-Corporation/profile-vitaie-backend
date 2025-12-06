@@ -5,6 +5,8 @@ import lombok.*;
 
 @Entity
 @Table(name = "Users")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -30,4 +32,13 @@ public class User {
     public enum UserSub {
         FREE, PREMIUM, ADMIN
     }
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Resumen resumen;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private RoadMap roadMap;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Employability employability;
 }
