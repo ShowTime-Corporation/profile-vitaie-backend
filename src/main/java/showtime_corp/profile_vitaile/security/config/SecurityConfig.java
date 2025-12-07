@@ -33,7 +33,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/register", "/auth/login").permitAll() // permitir login y register
                         .anyRequest().authenticated()
                 )
                 // AÑADIR ESTA LÍNEA CRÍTICA:

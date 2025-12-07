@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import showtime_corp.profile_vitaile.dto.AuthResponse;
+import showtime_corp.profile_vitaile.dto.LoginRequest;
 import showtime_corp.profile_vitaile.dto.RegisterRequest;
 import showtime_corp.profile_vitaile.entity.User;
 import showtime_corp.profile_vitaile.service.AuthService;
@@ -21,4 +23,11 @@ public class AuthController {
         authService.registerNewUser(request);
         return ResponseEntity.ok("User registered!");
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+        AuthResponse response = authService.login(request.getEmail(), request.getPassword());
+        return ResponseEntity.ok(response);
+    }
+
 }

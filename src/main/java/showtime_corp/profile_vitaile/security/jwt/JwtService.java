@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails; // Nuevo import
 import org.springframework.stereotype.Service;
+import showtime_corp.profile_vitaile.entity.User;
 
 import java.security.Key;
 import java.util.Date;
@@ -62,6 +63,12 @@ public class JwtService {
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact(); // O simplemente .signWith(getSigningKey(), SignatureAlgorithm.HS256)                .compact();
+    }
+
+    // --- Sobrecarga para login: generar token desde el User ---
+    public String generateToken(User user) {
+        // Usa el email del usuario como subject
+        return generateToken(user.getEmail());
     }
 
     // 3. Chequear Expiración
