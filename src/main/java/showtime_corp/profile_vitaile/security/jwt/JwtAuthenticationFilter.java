@@ -5,10 +5,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.NonNull; // Importación para buenas prácticas
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource; // Nuevo import
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -22,37 +24,54 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
+        final String authHeader = request.getHeader("Authorization");
+        final String token;
+        final String userEmail;
 
+        // 1. Verificar si la cabecera 'Authorization' existe y comienza con 'Bearer '
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String token = authHeader.substring(7);
-        String username = jwtService.getEmailFromToken(token);
+        // 2. Extraer el Token y el Username (Email)
+        token = authHeader.substring(7);
+        userEmail = jwtService.getEmailFromToken(token); // Este método debe estar en JwtService
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        // 3. Validar y Autenticar al Usuario
+        // Solo autentica si se encontró un email y NO hay una autenticación previa en el contexto
+        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails user = userDetailsService.loadUserByUsername(username);
+            // Cargar los detalles del usuario desde la base de datos (UserDetails)
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-            if (jwtService.isValid(token)) {
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(
-                                user,
-                                null,
-                                user.getAuthorities()
-                        );
+            // Verificar si el token sigue siendo válido para este usuario
+            if (jwtService.isTokenValid(token, userDetails)) {
 
-                SecurityContextHolder.getContext().setAuthentication(auth);
+                // Crear el objeto de autenticación
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null, // La contraseña es null porque ya estamos autenticando por token
+                        userDetails.getAuthorities()
+                );
+
+                // Agregar detalles del request para la autenticación
+                authToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
+
+                // Establecer la autenticación en el contexto de seguridad
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
 
+        // 4. Continuar la cadena de filtros de Spring Security
         filterChain.doFilter(request, response);
     }
 }
