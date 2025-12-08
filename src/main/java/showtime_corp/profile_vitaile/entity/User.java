@@ -15,10 +15,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    // Basic personal data
     private String firstName;
     private String lastName;
 
@@ -34,7 +36,21 @@ public class User implements UserDetails {
 
     public enum UserSub { FREE, PREMIUM, ADMIN }
 
+    // Profile fields (US-04)
+    private String phone;
 
+    @Column(columnDefinition = "TEXT")
+    private String techStack;
+
+    private String githubUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String experience;
+
+    private String cvUrl;   // URL or local path to the uploaded CV
+
+
+    // AI-Generated related entities (same)
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Resumen resumen;
 
@@ -45,6 +61,7 @@ public class User implements UserDetails {
     private Employability employability;
 
 
+    // Spring Security UserDetails methods
     @Override
     public String getUsername() {
         return email;

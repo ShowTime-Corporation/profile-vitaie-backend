@@ -33,15 +33,16 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/register", "/auth/login").permitAll() // permitir login y register
+                        .requestMatchers("/auth/register", "/auth/login").permitAll()
+                        .requestMatchers("/user/me", "/user/me/**").authenticated()  //
                         .anyRequest().authenticated()
                 )
-                // AÑADIR ESTA LÍNEA CRÍTICA:
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // <--- AÑADIR EL FILTRO
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
