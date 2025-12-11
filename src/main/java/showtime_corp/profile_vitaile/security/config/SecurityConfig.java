@@ -19,6 +19,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import showtime_corp.profile_vitaile.repository.UserRepository;
 import showtime_corp.profile_vitaile.security.jwt.JwtAuthenticationFilter;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -32,6 +34,7 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
+                .cors(withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/register", "/auth/login").permitAll()
                         .requestMatchers("/user/me", "/user/me/**").authenticated()  //

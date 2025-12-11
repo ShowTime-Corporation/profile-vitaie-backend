@@ -2,10 +2,7 @@ package showtime_corp.profile_vitaile.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import showtime_corp.profile_vitaile.dto.AuthResponse;
 import showtime_corp.profile_vitaile.dto.LoginRequest;
 import showtime_corp.profile_vitaile.dto.RegisterRequest;

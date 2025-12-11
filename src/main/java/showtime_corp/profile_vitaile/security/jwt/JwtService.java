@@ -67,9 +67,19 @@ public class JwtService {
 
     // --- Sobrecarga para login: generar token desde el User ---
     public String generateToken(User user) {
-        // Usa el email del usuario como subject
-        return generateToken(user.getEmail());
+        return Jwts.builder()
+                .claim("id", user.getId())
+                .claim("firstName", user.getFirstName())
+                .claim("lastName", user.getLastName())
+                .claim("email", user.getEmail())
+                .claim("role", user.getSub())
+                .setSubject(user.getEmail()) // Still set subject
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
+
 
     // 3. Chequear Expiración
     private boolean isTokenExpired(String token) {
