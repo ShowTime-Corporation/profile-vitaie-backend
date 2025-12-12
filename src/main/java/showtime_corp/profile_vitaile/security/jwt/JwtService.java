@@ -1,71 +1,131 @@
 package showtime_corp.profile_vitaile.security.jwt;
 
-import io.jsonwebtoken.Claims; // Importación para manejar los claims
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders; // Nuevo import
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails; // Nuevo import
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import showtime_corp.profile_vitaile.entity.User;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.function.Function; // Nuevo import
+import java.util.function.Function;
 
+/**
+ * Service responsible for generating, parsing and validating JWT tokens.
+ *
+ * <p>This service supports:
+ * <ul>
+ *     <li>Extracting claims from a token.</li>
+ *     <li>Creating tokens for login.</li>
+ *     <li>Validating token expiration and signature.</li>
+ *     <li>Embedding custom claims for user identity.</li>
+ * </ul>
+ *
+ * <p>The secret key and expiration time are loaded from application properties.
+ */
 @Service
 public class JwtService {
+
+    /** Secret key used for signing tokens (Base64 encoded). */
     @Value("${security.jwt.secret}")
     private String secretKey;
 
+    /** Expiration time in milliseconds. */
     @Value("${security.jwt.expiration}")
     private Long expiration;
 
-    // --- Métodos de Ayuda ---
+    // ======================
+    // Internal Helper Methods
+    // ======================
 
+    /**
+     * Returns the signing key used to sign and validate JWT tokens.
+     * The key is decoded from Base64.
+     *
+     * @return HMAC signature key.
+     */
     private Key getSigningKey() {
-        // Usa Decoders para decodificar la clave de forma segura
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    /**
+     * Extracts all claims from a JWT token.
+     *
+     * @param token The JWT token.
+     * @return The parsed Claims.
+     */
     private Claims extractAllClaims(String token) {
         return Jwts
-                .parser() // Uso de builder moderno
+                .parser()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
 
+    /**
+     * Extracts a specific claim from a token using a resolver function.
+     *
+     * @param token The JWT token.
+     * @param claimsResolver Function that retrieves a specific claim.
+     * @param <T> Type of the expected claim.
+     * @return The extracted claim.
+     */
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
+        Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
+    /**
+     * Extracts the expiration date of the token.
+     *
+     * @param token JWT token.
+     * @return Expiration date.
+     */
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    // --- Métodos Requeridos por el Filtro ---
+    // ======================
+    // Public API
+    // ======================
 
-    // 1. Extraer Email (Subject) del Token
+    /**
+     * Retrieves the email (subject) contained in the JWT token.
+     *
+     * @param token The token.
+     * @return The email of the user.
+     */
     public String getEmailFromToken(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // 2. Generar Token (Mantienes tu lógica, pero usa builder moderno)
+    /**
+     * Generates a JWT token containing only the email (simple token).
+     *
+     * @param email Email to set as subject.
+     * @return Generated JWT.
+     */
     public String generateToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact(); // O simplemente .signWith(getSigningKey(), SignatureAlgorithm.HS256)                .compact();
+                .compact();
     }
 
-    // --- Sobrecarga para login: generar token desde el User ---
+    /**
+     * Generates a JWT token embedding user-specific claims.
+     *
+     * @param user User whose data will be added to the token.
+     * @return A JWT with custom claims.
+     */
     public String generateToken(User user) {
         return Jwts.builder()
                 .claim("id", user.getId())
@@ -73,23 +133,36 @@ public class JwtService {
                 .claim("lastName", user.getLastName())
                 .claim("email", user.getEmail())
                 .claim("role", user.getSub())
-                .setSubject(user.getEmail()) // Still set subject
+                .setSubject(user.getEmail())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-
-    // 3. Chequear Expiración
+    /**
+     * Checks if the token has expired.
+     *
+     * @param token JWT token.
+     * @return true if expired, false otherwise.
+     */
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
-    // 4. Validación Final (Usado por JwtAuthenticationFilter)
+    /**
+     * Validates the token:
+     * <ul>
+     *     <li>Checks if the subject matches the user email.</li>
+     *     <li>Checks if the token is not expired.</li>
+     * </ul>
+     *
+     * @param token The JWT token.
+     * @param userDetails Spring Security user details.
+     * @return true if valid, false otherwise.
+     */
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = getEmailFromToken(token);
-        // Debe coincidir el email Y no debe estar expirado
+        String username = getEmailFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 }

@@ -14,47 +14,101 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import showtime_corp.profile_vitaile.repository.UserRepository;
 import showtime_corp.profile_vitaile.security.jwt.JwtAuthenticationFilter;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
+/**
+ * Configuration class responsible for defining Spring Security settings.
+ *
+ * <p>This includes:</p>
+ * <ul>
+ *     <li>Endpoint authorization rules</li>
+ *     <li>JWT authentication filter registration</li>
+ *     <li>Disabling CSRF for stateless APIs</li>
+ *     <li>Password encoder configuration</li>
+ *     <li>AuthenticationManager exposure</li>
+ * </ul>
+ *
+ * <p>
+ * The application runs in a fully stateless mode using JWT tokens,
+ * meaning no HTTP session is used to store authentication state.
+ * </p>
+ */
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-    // Asumiendo que inyectas el filtro
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-// ... dentro del método filterChain
-
+    /**
+     * Configures the HTTP security filter chain used by Spring Security.
+     *
+     * <p><b>Main configurations:</b></p>
+     * <ul>
+     *     <li>Disables CSRF because the API uses JWT (stateless)</li>
+     *     <li>Allows public access to /auth/login and /auth/register</li>
+     *     <li>Requires authentication for all other endpoints</li>
+     *     <li>Sets session strategy to STATELESS</li>
+     *     <li>Registers the custom {@link JwtAuthenticationFilter} before the standard login filter</li>
+     * </ul>
+     *
+     * @param http The {@link HttpSecurity} instance configured by Spring.
+     * @return A fully configured {@link SecurityFilterChain}.
+     * @throws Exception If any configuration step fails.
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/register", "/auth/login").permitAll()
-                        .requestMatchers("/user/me", "/user/me/**").authenticated()  //
-                        .anyRequest().authenticated()
+                        .requestMatchers("/auth/register", "/auth/login").permitAll()  // Public endpoints
+                        .anyRequest().authenticated()                                   // All other routes require authentication
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)   // No HTTP session
+                )
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                ); // Adds the JWT filter before Spring's login filter
 
         return http.build();
     }
 
-
+    /**
+     * Exposes the {@link AuthenticationManager} as a Spring Bean.
+     *
+     * <p>
+     * This allows authentication logic (e.g., during login)
+     * to be performed manually using Spring Security mechanisms.
+     * </p>
+     *
+     * @param config The automatically configured {@link AuthenticationConfiguration}.
+     * @return The authentication manager instance.
+     * @throws Exception If initialization fails.
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
+    /**
+     * Provides the password encoder used to hash and verify user passwords.
+     *
+     * <p>
+     * Uses {@link BCryptPasswordEncoder} because:
+     * </p>
+     * <ul>
+     *     <li>It is secure and recommended by Spring</li>
+     *     <li>It automatically handles salting</li>
+     *     <li>It is resistant to brute-force attacks</li>
+     * </ul>
+     *
+     * @return A BCrypt-based {@link PasswordEncoder}.
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }
