@@ -1,7 +1,13 @@
 package showtime_corp.profile_vitaile.entity;
 
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Type;
+import showtime_corp.profile_vitaile.entity.roadmap.RoadAnalysis;
+import showtime_corp.profile_vitaile.entity.roadmap.RoadIdeas;
+import showtime_corp.profile_vitaile.entity.roadmap.RoadKeep;
+import showtime_corp.profile_vitaile.entity.roadmap.RoadProposal;
 
 @Entity
 @Table(name = "RoadMap")
@@ -9,25 +15,34 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+/**
+ * Represents an AI-generated professional roadmap.
+ */
+
 public class RoadMap {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer roadmap_id;
+    @Column(name = "roadmap_id")
+    private Long id;
 
     @OneToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @Column(columnDefinition = "TEXT")
-    private String road_analisis;
+    @Type(JsonType.class)
+    @Column(name = "road_analisis", nullable = false, columnDefinition = "json")
+    private RoadAnalysis analysis;
 
-    @Column(columnDefinition = "TEXT")
-    private String road_proposal;
+    @Type(JsonType.class)
+    @Column(name = "road_proposal", nullable = false, columnDefinition = "json")
+    private RoadProposal proposal;
 
-    @Column(columnDefinition = "TEXT")
-    private String road_ideas;
+    @Type(JsonType.class)
+    @Column(name = "road_ideas", nullable = false, columnDefinition = "json")
+    private RoadIdeas ideas;
 
-    @Column(columnDefinition = "TEXT")
-    private String road_keep;
+    @Type(JsonType.class)
+    @Column(name = "road_keep", nullable = false, columnDefinition = "json")
+    private RoadKeep keep;
 }

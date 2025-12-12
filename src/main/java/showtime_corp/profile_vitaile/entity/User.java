@@ -2,8 +2,14 @@ package showtime_corp.profile_vitaile.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Type;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import showtime_corp.profile_vitaile.entity.user.UserEducation;
+import showtime_corp.profile_vitaile.entity.user.UserLinks;
+import showtime_corp.profile_vitaile.entity.user.UserExperience;
+import showtime_corp.profile_vitaile.entity.user.UserSkills;
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,21 +20,34 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+
+/**
+ * Represents an application user.
+ * <p>
+ * Central entity that stores personal and professional profile data.
+ * JSON fields are used for flexible and scalable profile sections.
+ * </p>
+ */
 public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @Column(name = "user_id")
+    private Long id;
 
-    // Basic personal data
+    @Column(name = "first_name", nullable = false, length = 200)
     private String firstName;
+
+    @Column(name = "last_name", nullable = false, length = 200)
     private String lastName;
 
-    @Column(unique = true)
+    @Column(name = "user_email", nullable = false, unique = true, length = 300)
     private String email;
 
+    @Column(name = "user_password", nullable = false, length = 255)
     private String password;
 
+    @Column(name = "user_active", nullable = false)
     private Boolean active = true;
 
     @Enumerated(EnumType.STRING)
@@ -36,30 +55,37 @@ public class User implements UserDetails {
 
     public enum UserSub { FREE, PREMIUM, ADMIN }
 
-    // Profile fields (US-04)
-    private String phone;
+    @Column(name = "user_degree")
+    private String degree;
 
-    @Column(columnDefinition = "TEXT")
-    private String techStack;
+    @Column(name = "user_location")
+    private String location;
 
-    private String githubUrl;
+    @Column(name = "user_years")
+    private Integer yearsOfExperience;
 
-    @Column(columnDefinition = "TEXT")
-    private String experience;
+    @Column(name = "user_bio")
+    private String bio;
 
-    private String cvUrl;   // URL or local path to the uploaded CV
+    @Type(JsonType.class)
+    @Column(name = "user_skills", columnDefinition = "json")
+    private UserSkills skills;
 
+    @Type(JsonType.class)
+    @Column(name = "user_experience", columnDefinition = "json")
+    private List<UserExperience> experience; // List<UserExperience>
 
-    // AI-Generated related entities (same)
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Resumen resumen;
+    @Type(JsonType.class)
+    @Column(name = "user_education", columnDefinition = "json")
+    private List<UserEducation> education;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private RoadMap roadMap;
+    @Type(JsonType.class)
+    @Column(name = "user_link", columnDefinition = "json")
+    private UserLinks links;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Employability employability;
-
+    @Type(JsonType.class)
+    @Column(name = "user_pdf", columnDefinition = "json")
+    private String pdf;
 
     // Spring Security UserDetails methods
     @Override
