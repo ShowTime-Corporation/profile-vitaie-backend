@@ -1,7 +1,10 @@
 package showtime_corp.profile_vitaile.entity;
 
+import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Type;
+import showtime_corp.profile_vitaile.entity.employability.Offer;
 
 @Entity
 @Table(name = "Employability")
@@ -9,22 +12,30 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+
+/**
+ * Stores AI-generated employability analysis for a user.
+ */
 public class Employability {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer employability_id;
+    @Column(name = "employability_id")
+    private Long id;
 
     @OneToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @Column(columnDefinition = "TEXT")
-    private String tech_offer;
+    @Type(JsonType.class)
+    @Column(name = "tech_offer", nullable = false, columnDefinition = "json")
+    private Offer techOffer;
 
-    @Column(columnDefinition = "TEXT")
-    private String education_offer;
+    @Type(JsonType.class)
+    @Column(name = "education_offer", nullable = false, columnDefinition = "json")
+    private Offer educationOffer;
 
-    @Column(columnDefinition = "TEXT")
-    private String company_offer;
+    @Type(JsonType.class)
+    @Column(name = "company_offer", nullable = false, columnDefinition = "json")
+    private Offer companyOffer;
 }
