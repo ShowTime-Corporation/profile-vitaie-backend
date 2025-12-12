@@ -5,7 +5,9 @@ import lombok.*;
 import org.hibernate.annotations.Type;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import showtime_corp.profile_vitaile.entity.user.UserEducation;
 import showtime_corp.profile_vitaile.entity.user.UserLinks;
+import showtime_corp.profile_vitaile.entity.user.UserExperience;
 import showtime_corp.profile_vitaile.entity.user.UserSkills;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 
@@ -71,11 +73,11 @@ public class User implements UserDetails {
 
     @Type(JsonType.class)
     @Column(name = "user_experience", columnDefinition = "json")
-    private Object experience; // List<UserExperience>
+    private List<UserExperience> experience; // List<UserExperience>
 
     @Type(JsonType.class)
     @Column(name = "user_education", columnDefinition = "json")
-    private Object education; // List<UserEducation>
+    private List<UserEducation> education;
 
     @Type(JsonType.class)
     @Column(name = "user_link", columnDefinition = "json")
