@@ -1,5 +1,11 @@
 package showtime_corp.profile_vitaile.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -11,15 +17,35 @@ import showtime_corp.profile_vitaile.entity.User;
 import showtime_corp.profile_vitaile.repository.UserRepository;
 import showtime_corp.profile_vitaile.service.UserProfileService;
 
+/**
+ * REST controller responsible for managing authenticated user profile data.
+ *
+ * <p>This includes retrieving the user's own profile, updating personal data,
+ * and uploading a CV file. All operations rely on the authenticated user's identity
+ * obtained through Spring Security's {@link Authentication} object.</p>
+ *
+ * <p>The controller delegates business logic to {@link UserProfileService}
+ * and fetches user identifiers using {@link UserRepository}.</p>
+ *
+ * @author Andres Niebles y Santiago Toro
+ * @version 1.0
+ */
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
+@Tag(name = "User Profile", description = "Operations for retrieving and updating user profile data")
 public class UserProfileController {
 
     private final UserProfileService userProfileService;
     private final UserRepository userRepository;
 
-    // Extract user email from authentication and fetch user ID from database
+    /**
+     * Extracts the authenticated user's ID using their email address from {@link Authentication}.
+     *
+     * @param auth the authentication object containing the logged user's principal information
+     * @return the user's database ID
+     * @throws RuntimeException if the user is not found in the database
+     */
     private Integer getUserIdFromAuth(Authentication auth) {
         String email = auth.getName();
         User user = userRepository.findByEmail(email)
@@ -27,24 +53,94 @@ public class UserProfileController {
         return user.getId();
     }
 
-    // Return logged user's profile data
+    /**
+     * Retrieves the profile information of the currently authenticated user.
+     *
+     * @param auth the authentication token containing the logged user's identity
+     * @return the user's profile data
+     */
+    @Operation(
+            summary = "Get my profile",
+            description = "Returns the profile information of the authenticated user.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Profile retrieved successfully",
+                            content = @Content(schema = @Schema(implementation = UserProfileResponseDTO.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized"
+                    )
+            }
+    )
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponseDTO> getMyProfile(Authentication auth) {
         Integer userId = getUserIdFromAuth(auth);
         return ResponseEntity.ok(userProfileService.getProfile(userId));
     }
 
-    // Update logged user's profile information
+    /**
+     * Updates the authenticated user's profile information.
+     *
+     * @param auth authentication data of the logged user
+     * @param dto the updated profile fields
+     * @return the updated profile information
+     */
+    @Operation(
+            summary = "Update my profile",
+            description = "Updates the profile data of the authenticated user.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Profile updated successfully",
+                            content = @Content(schema = @Schema(implementation = UserProfileResponseDTO.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Validation error"
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized"
+                    )
+            }
+    )
     @PutMapping("/me")
     public ResponseEntity<UserProfileResponseDTO> updateMyProfile(
             Authentication auth,
-            @RequestBody UserProfileRequestDTO dto) {
+            @org.springframework.web.bind.annotation.RequestBody UserProfileRequestDTO dto) {
 
         Integer userId = getUserIdFromAuth(auth);
         return ResponseEntity.ok(userProfileService.updateProfile(userId, dto));
     }
 
-    // Upload CV file and update user profile with CV URL
+    /**
+     * Uploads a CV file for the authenticated user and updates the profile with the stored CV URL.
+     *
+     * @param auth authentication object containing the logged user's identity
+     * @param file the CV file to upload
+     * @return the updated profile including CV information
+     */
+    @Operation(
+            summary = "Upload CV",
+            description = "Uploads a CV file for the authenticated user and updates their profile.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "CV uploaded and profile updated",
+                            content = @Content(schema = @Schema(implementation = UserProfileResponseDTO.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Invalid file format"
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized"
+                    )
+            }
+    )
     @PostMapping("/me/upload-cv")
     public ResponseEntity<UserProfileResponseDTO> uploadCv(
             Authentication auth,
