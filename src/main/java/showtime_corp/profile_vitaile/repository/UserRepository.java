@@ -5,7 +5,7 @@ import showtime_corp.profile_vitaile.entity.User;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<User, Long> { // Change integer Id to Long
     Optional<User> findByEmail(String email);
     boolean existsByEmail(String email);
 }
