@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import showtime_corp.profile_vitaile.dto.AuthResponse;
-import showtime_corp.profile_vitaile.dto.LoginRequest;
+import showtime_corp.profile_vitaile.dto.AuthRequest;
 import showtime_corp.profile_vitaile.dto.RegisterRequest;
 import showtime_corp.profile_vitaile.service.AuthService;
 
@@ -92,7 +92,7 @@ public class AuthController {
             }
     )
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         AuthResponse response = authService.login(request.getEmail(), request.getPassword());
         return ResponseEntity.ok(response);
     }
