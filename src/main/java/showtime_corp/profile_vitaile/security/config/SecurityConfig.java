@@ -46,7 +46,7 @@ public class SecurityConfig {
      * <p><b>Main configurations:</b></p>
      * <ul>
      *     <li>Disables CSRF because the API uses JWT (stateless)</li>
-     *     <li>Allows public access to /auth/login and /auth/register</li>
+     *     <li>Allows public access to authentication and Swagger endpoints</li>
      *     <li>Requires authentication for all other endpoints</li>
      *     <li>Sets session strategy to STATELESS</li>
      *     <li>Registers the custom {@link JwtAuthenticationFilter} before the standard login filter</li>
@@ -62,16 +62,27 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/register", "/auth/login").permitAll()  // Public endpoints
-                        .anyRequest().authenticated()                                   // All other routes require authentication
+                        // Public authentication endpoints
+                        .requestMatchers("/auth/register", "/auth/login").permitAll()
+
+                        // Swagger / OpenAPI endpoints
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+
+                        // All other routes require authentication
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)   // No HTTP session
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                // Adds the JWT filter before Spring's login filter
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
-                ); // Adds the JWT filter before Spring's login filter
+                );
 
         return http.build();
     }
