@@ -15,7 +15,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import showtime_corp.profile_vitaile.security.jwt.JwtAuthenticationFilter;
+
+import java.util.List;
 
 /**
  * Configuration class responsible for defining Spring Security settings.
@@ -60,6 +65,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // Public authentication endpoints
@@ -85,6 +91,37 @@ public class SecurityConfig {
                 );
 
         return http.build();
+    }
+
+    /**
+     * Configures the Cross-Origin Resource Sharing (CORS) settings for the application.
+     *
+     * <p>This bean defines the CORS policy, which is crucial for allowing frontend applications
+     * hosted on different origins (e.g., http://localhost:4200) to interact with the API.</p>
+     *
+     * <p><b>Current configuration:</b></p>
+     * <ul>
+     *     <li><b>Allowed Origins:</b> Only 'http://localhost:4200' is permitted.</li>
+     *     <li><b>Allowed Methods:</b> GET, POST, PUT, DELETE, OPTIONS.</li>
+     *     <li><b>Allowed Headers:</b> All headers are permitted.</li>
+     *     <li><b>Allow Credentials:</b> Set to true to support cookies and authentication headers.</li>
+     * </ul>
+     *
+     * @return A {@link CorsConfigurationSource} instance with the defined settings.
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowedOrigins(List.of("http://localhost:4200"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
     }
 
     /**
