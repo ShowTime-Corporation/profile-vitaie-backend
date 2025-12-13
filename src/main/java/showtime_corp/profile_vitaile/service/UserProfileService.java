@@ -6,9 +6,7 @@ import showtime_corp.profile_vitaile.dto.UserProfileResponseDTO;
 
 public interface UserProfileService {
 
-    UserProfileResponseDTO getProfile(Integer userId);
-
-    UserProfileResponseDTO updateProfile(Integer userId, UserProfileRequestDTO dto);
-
-    UserProfileResponseDTO uploadCv(Integer userId, MultipartFile file);
+    UserProfileResponseDTO getProfile(Long userId);
+    UserProfileResponseDTO updateProfile(Long userId, UserProfileRequestDTO dto);
+    UserProfileResponseDTO uploadCv(Long userId, MultipartFile file);
 }
