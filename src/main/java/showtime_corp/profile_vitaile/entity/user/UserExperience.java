@@ -1,4 +1,4 @@
-package com.profilevitaie.model.user;
+package showtime_corp.profile_vitaile.entity.user;
 
 import java.time.LocalDate;
 
