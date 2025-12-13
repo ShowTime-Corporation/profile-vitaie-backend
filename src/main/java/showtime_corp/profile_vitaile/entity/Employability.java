@@ -7,7 +7,7 @@ import org.hibernate.annotations.Type;
 import showtime_corp.profile_vitaile.entity.employability.Offer;
 
 @Entity
-@Table(name = "Employability")
+@Table(name = "employability")
 @Getter
 @Setter
 @NoArgsConstructor

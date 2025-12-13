@@ -10,7 +10,7 @@ import showtime_corp.profile_vitaile.entity.roadmap.RoadKeep;
 import showtime_corp.profile_vitaile.entity.roadmap.RoadProposal;
 
 @Entity
-@Table(name = "RoadMap")
+@Table(name = "roadmap")
 @Getter
 @Setter
 @NoArgsConstructor

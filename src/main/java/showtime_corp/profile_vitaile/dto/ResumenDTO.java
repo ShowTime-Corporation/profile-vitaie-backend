@@ -6,6 +6,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
+/**
+ * DTO representing AI-generated resumen.
+ */
+@Schema(description = "Resumen AI-generated data")
 public class ResumenDTO {
 
     @NotNull(message = "user_id can not be empty")
