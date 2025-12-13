@@ -10,7 +10,7 @@ import showtime_corp.profile_vitaile.entity.resumen.ResumeRecommendation;
 import showtime_corp.profile_vitaile.entity.resumen.ResumeSimple;
 
 @Entity
-@Table(name = "Resumen")
+@Table(name = "resumen")
 @Getter
 @Setter
 @NoArgsConstructor
