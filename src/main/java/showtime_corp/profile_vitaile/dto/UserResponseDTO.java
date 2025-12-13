@@ -2,6 +2,9 @@ package showtime_corp.profile_vitaile.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import showtime_corp.profile_vitaile.entity.user.UserEducation;
+import showtime_corp.profile_vitaile.entity.user.UserExperience;
+import showtime_corp.profile_vitaile.entity.user.UserLinks;
 
 import java.util.List;
 
@@ -83,7 +86,7 @@ public class UserResponseDTO {
                     ]
                     """
     )
-    private List<Object> experience;
+    private List<UserExperience> experience;
 
     @Schema(
             description = "Educational background",
@@ -97,7 +100,7 @@ public class UserResponseDTO {
                     ]
                     """
     )
-    private List<Object> education;
+    private List<UserEducation> education;
 
     @Schema(
             description = "User social and professional links",
@@ -110,17 +113,11 @@ public class UserResponseDTO {
                     }
                     """
     )
-    private Object links;
+    private UserLinks links;
 
     @Schema(
             description = "Uploaded CV/PDF information",
-            example = """
-                    {
-                      "fileName": "cv_john.pdf",
-                      "fileUrl": "https://cdn.mysite.com/cv/cv_john.pdf",
-                      "uploadedAt": "2025-01-01T11:00:00Z"
-                    }
-                    """
+            example = "*JSON*"
     )
-    private Object pdf;
+    private String pdf;
 }
