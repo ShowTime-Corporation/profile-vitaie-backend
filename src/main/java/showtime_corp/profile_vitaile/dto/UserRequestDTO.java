@@ -2,8 +2,11 @@ package showtime_corp.profile_vitaile.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
-
 import lombok.Data;
+import showtime_corp.profile_vitaile.entity.user.UserEducation;
+import showtime_corp.profile_vitaile.entity.user.UserExperience;
+import showtime_corp.profile_vitaile.entity.user.UserLinks;
+import showtime_corp.profile_vitaile.entity.user.UserSkills;
 
 import java.util.List;
 
@@ -15,14 +18,13 @@ import java.util.List;
  */
 public class UserRequestDTO {
 
-
     @Schema(
             description = "User first name",
             example = "John"
     )
     @NotBlank(message = "Name can not be empty")
     @Size(max = 200, message = "Name can not be more than 200 characters")
-    private String first_name;
+    private String firstName;
 
     @Schema(
             description = "User last name",
@@ -30,32 +32,7 @@ public class UserRequestDTO {
     )
     @NotBlank(message = "Lastname can not be empty")
     @Size(max = 200, message = "Lastname can not be more than 200 characters")
-    private String last_name;
-
-    @Schema(
-            description = "Email used for login and notifications",
-            example = "john.doe@example.com"
-    )
-    @NotBlank(message = "Email can not be empty")
-    @Email(message = "Invalid email format")
-    @Size(max = 300)
-    private String user_email;
-
-
-    @Schema(
-            description = "User password",
-            example = "password123"
-    )
-    @NotBlank(message = "Password can not be empty")
-    @Size(min = 6, max = 200, message = "Password must be between 6 and 200 characters")
-    private String user_password;
-
-    @Schema(
-            description = "User role",
-            example = "FREE"
-    )
-    @NotNull(message = "Role can not be null")
-    private String user_sub; // FREE, PREMIUM, ADMIN
+    private String lastName;
 
     @Schema(
             description = "Biography or personal description",
@@ -85,6 +62,17 @@ public class UserRequestDTO {
     private Integer yearsOfExperience;
 
     @Schema(
+            description = "User skills",
+            example = """
+                    {
+                      "languages": ["Java", "Spring Boot"],
+                      "tools": ["Docker", "Postman"]
+                    }
+                    """
+    )
+    private UserSkills skills;
+
+    @Schema(
             description = "List of work experience items",
             example = """
                     [
@@ -98,7 +86,7 @@ public class UserRequestDTO {
                     ]
                     """
     )
-    private List<Object> experience;
+    private List<UserExperience> experience;
 
     @Schema(
             description = "Educational background",
@@ -112,7 +100,7 @@ public class UserRequestDTO {
                     ]
                     """
     )
-    private List<Object> education;
+    private List<UserEducation> education;
 
     @Schema(
             description = "User social and professional links",
@@ -125,12 +113,11 @@ public class UserRequestDTO {
                     }
                     """
     )
-    private Object links;
+    private UserLinks links;
 
     @Schema(
             description = "Uploaded CV/PDF information",
             example = "*JSON*"
     )
     private String pdf;
-
 }

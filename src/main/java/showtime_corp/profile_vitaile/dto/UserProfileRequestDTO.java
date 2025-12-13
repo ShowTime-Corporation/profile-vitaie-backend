@@ -1,15 +1,23 @@
 package showtime_corp.profile_vitaile.dto;
 
 import lombok.Data;
+import showtime_corp.profile_vitaile.entity.user.UserEducation;
+import showtime_corp.profile_vitaile.entity.user.UserExperience;
+import showtime_corp.profile_vitaile.entity.user.UserLinks;
+import showtime_corp.profile_vitaile.entity.user.UserSkills;
+
+import java.util.List;
 
 @Data
 public class UserProfileRequestDTO {
-
     private String firstName;
     private String lastName;
-    private String phone;
-    private String techStack;
-    private String githubUrl;
-    private String experience;
-
+    private String degree;   //UserProfileRequestDTO update aligned with user remodel
+    private String location;
+    private Integer yearsOfExperience;
+    private String bio;
+    private UserSkills skills;
+    private List<UserExperience> experience;
+    private List<UserEducation> education;
+    private UserLinks links;
 }

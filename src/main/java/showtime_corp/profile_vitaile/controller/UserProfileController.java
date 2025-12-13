@@ -3,7 +3,6 @@ package showtime_corp.profile_vitaile.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +45,7 @@ public class UserProfileController {
      * @return the user's database ID
      * @throws RuntimeException if the user is not found in the database
      */
-    private Integer getUserIdFromAuth(Authentication auth) {
+    private Long getUserIdFromAuth(Authentication auth) { // Change Integer to Long
         String email = auth.getName();
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -76,7 +75,7 @@ public class UserProfileController {
     )
     @GetMapping("/me")
     public ResponseEntity<UserProfileResponseDTO> getMyProfile(Authentication auth) {
-        Integer userId = getUserIdFromAuth(auth);
+        Long userId = getUserIdFromAuth(auth); // Change Integer to Long
         return ResponseEntity.ok(userProfileService.getProfile(userId));
     }
 
@@ -111,7 +110,7 @@ public class UserProfileController {
             Authentication auth,
             @org.springframework.web.bind.annotation.RequestBody UserProfileRequestDTO dto) {
 
-        Integer userId = getUserIdFromAuth(auth);
+        Long userId = getUserIdFromAuth(auth); // Change Integer to Long
         return ResponseEntity.ok(userProfileService.updateProfile(userId, dto));
     }
 
@@ -146,7 +145,7 @@ public class UserProfileController {
             Authentication auth,
             @RequestParam("file") MultipartFile file) {
 
-        Integer userId = getUserIdFromAuth(auth);
+        Long userId = getUserIdFromAuth(auth); // Change Integer to Long
         return ResponseEntity.ok(userProfileService.uploadCv(userId, file));
     }
 }

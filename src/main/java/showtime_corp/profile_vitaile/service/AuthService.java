@@ -5,10 +5,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import showtime_corp.profile_vitaile.dto.AuthResponse;
 import showtime_corp.profile_vitaile.dto.RegisterRequest;
+import showtime_corp.profile_vitaile.dto.AuthUserResponseDTO;
 import showtime_corp.profile_vitaile.entity.User;
 import showtime_corp.profile_vitaile.exception.BadRequestException;
 import showtime_corp.profile_vitaile.exception.ConflictException;
 import showtime_corp.profile_vitaile.exception.ResourceNotFoundException;
+import showtime_corp.profile_vitaile.mapper.UserMapper;
 import showtime_corp.profile_vitaile.repository.UserRepository;
 import showtime_corp.profile_vitaile.security.jwt.JwtService;
 
@@ -29,6 +31,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final UserMapper userMapper;
 
     /**
      * Registers a new user in the system.
@@ -40,33 +43,28 @@ public class AuthService {
      * </ul>
      *
      * @param request The registration data provided by the client.
-     * @return The newly created {@link User} entity.
+     * @return A DTO representing the newly created user.
      *
      * @throws ConflictException If the email is already in use.
      */
-    public User registerNewUser(RegisterRequest request) {
+    public AuthUserResponseDTO registerNewUser(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new ConflictException("Email already exists");
         }
 
-        User user = new User();
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setEmail(request.getEmail());
+        // Map incoming request to User entity using MapStruct
+        User user = userMapper.fromRegisterRequest(request);
 
-        // Encrypt password
-        String encodedPassword = passwordEncoder.encode(request.getPassword());
-        user.setPassword(encodedPassword);
+        // Encrypt and set password
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        // Default user properties
+        // Set default user properties
         user.setActive(true);
         user.setSub(User.UserSub.FREE);
-        user.setResumen(null);
-        user.setRoadMap(null);
-        user.setEmployability(null);
 
-        return userRepository.save(user);
+        // Persist user and return mapped response DTO
+        return userMapper.toAuthUserResponse(userRepository.save(user));
     }
 
     /**
@@ -81,7 +79,7 @@ public class AuthService {
      *
      * @param email    User's email address.
      * @param password Raw password entered by the user.
-     * @return {@link AuthResponse} containing a valid JWT token.
+     * @return {@link AuthResponse} containing a valid JWT token and user data.
      *
      * @throws ResourceNotFoundException If the email does not belong to a registered user.
      * @throws BadRequestException       If the password is incorrect.
@@ -95,10 +93,12 @@ public class AuthService {
             throw new BadRequestException("Invalid credentials");
         }
 
+        // Generate JWT token based on authenticated user
         String token = jwtService.generateToken(user);
 
         return AuthResponse.builder()
                 .token(token)
+                .user(userMapper.toAuthUserResponse(user))
                 .build();
     }
 }

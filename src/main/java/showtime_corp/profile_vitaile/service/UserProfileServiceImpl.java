@@ -10,6 +10,7 @@ import showtime_corp.profile_vitaile.entity.User;
 import showtime_corp.profile_vitaile.exception.InternalServerErrorException;
 import showtime_corp.profile_vitaile.exception.ResourceNotFoundException;
 import showtime_corp.profile_vitaile.exception.UnprocessableEntityException;
+import showtime_corp.profile_vitaile.mapper.UserProfileMapper;
 import showtime_corp.profile_vitaile.repository.UserRepository;
 
 import java.io.File;
@@ -28,6 +29,7 @@ import java.io.IOException;
 public class UserProfileServiceImpl implements UserProfileService {
 
     private final UserRepository userRepository;
+    private final UserProfileMapper userProfileMapper;
 
     /**
      * Retrieves the profile of a specific user by ID.
@@ -37,50 +39,46 @@ public class UserProfileServiceImpl implements UserProfileService {
      * @throws ResourceNotFoundException if the user does not exist
      */
     @Override
-    public UserProfileResponseDTO getProfile(Integer userId) {
+    public UserProfileResponseDTO getProfile(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        return buildResponse(user);
+        // Map entity to response DTO using MapStruct
+        return userProfileMapper.toResponse(user);
     }
 
     /**
      * Updates the profile of the specified user.
      *
      * @param userId the user ID
-     * @param dto the data to update in the user's profile
+     * @param dto    the data to update in the user's profile
      * @return updated profile data as a DTO
      * @throws ResourceNotFoundException if the user does not exist
      */
     @Override
-    public UserProfileResponseDTO updateProfile(Integer userId, UserProfileRequestDTO dto) {
+    public UserProfileResponseDTO updateProfile(Long userId, UserProfileRequestDTO dto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        user.setFirstName(dto.getFirstName());
-        user.setLastName(dto.getLastName());
-        user.setPhone(dto.getPhone());
-        user.setTechStack(dto.getTechStack());
-        user.setGithubUrl(dto.getGithubUrl());
-        user.setExperience(dto.getExperience());
-
+        // Apply incoming changes to existing user entity
+        userProfileMapper.updateUserFromDto(dto, user);
         userRepository.save(user);
 
-        return buildResponse(user);
+        return userProfileMapper.toResponse(user);
     }
 
     /**
      * Uploads a CV file for a given user, stores it, and updates the CV URL in the user's profile.
      *
      * @param userId the user uploading the CV
-     * @param file the uploaded file
+     * @param file   the uploaded file
      * @return the updated profile including the new CV URL
-     * @throws ResourceNotFoundException if the user is not found
+     * @throws ResourceNotFoundException    if the user is not found
      * @throws UnprocessableEntityException if the file is empty or invalid
      * @throws InternalServerErrorException if any unexpected error occurs during file handling
      */
     @Override
-    public UserProfileResponseDTO uploadCv(Integer userId, MultipartFile file) {
+    public UserProfileResponseDTO uploadCv(Long userId, MultipartFile file) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -97,15 +95,12 @@ public class UserProfileServiceImpl implements UserProfileService {
                 throw new InternalServerErrorException("Could not create upload directory");
             }
 
-            // Store file with prefix userID_ to avoid collisions
+            // Store file with prefix userId_ to avoid name collisions
             String fileName = userId + "_" + file.getOriginalFilename();
-            String filePath = uploadDir + fileName;
+            file.transferTo(new File(uploadDir + fileName));
 
-            File dest = new File(filePath);
-            file.transferTo(dest);
-
-            // (Optional but recommended) Only save a relative path in DB
-            user.setCvUrl("/uploads/cv/" + fileName);
+            // Store relative path in database
+            user.setPdf("/uploads/cv/" + fileName);
             userRepository.save(user);
 
         } catch (IOException e) {
@@ -113,26 +108,6 @@ public class UserProfileServiceImpl implements UserProfileService {
             throw new InternalServerErrorException("Failed to upload CV");
         }
 
-        return buildResponse(user);
-    }
-
-    /**
-     * Maps a {@link User} entity to a {@link UserProfileResponseDTO}.
-     *
-     * @param user the user entity to map
-     * @return a formatted DTO representing the user's profile
-     */
-    private UserProfileResponseDTO buildResponse(User user) {
-        return UserProfileResponseDTO.builder()
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .phone(user.getPhone())
-                .techStack(user.getTechStack())
-                .githubUrl(user.getGithubUrl())
-                .experience(user.getExperience())
-                .cvUrl(user.getCvUrl())
-                .build();
+        return userProfileMapper.toResponse(user);
     }
 }
