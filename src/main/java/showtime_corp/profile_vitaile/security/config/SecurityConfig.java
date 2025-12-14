@@ -80,6 +80,13 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
 
+                        .requestMatchers(
+                                "/actuator/health",
+                                "/actuator/prometheus"
+                        ).permitAll()
+
+                        .requestMatchers("/actuator/**").hasRole("ADMIN")
+
                         // All other routes require authentication
                         .anyRequest().authenticated()
                 )

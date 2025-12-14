@@ -165,4 +165,13 @@ public class JwtService {
         String username = getEmailFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+    /**
+     * Retrieves the user ID from the JWT token.
+     *
+     * @param token JWT token.
+     * @return User ID.
+     */
+    public Integer getUserIdFromToken(String token) {
+        return extractClaim(token, claims -> claims.get("id", Integer.class));
+    }
 }
