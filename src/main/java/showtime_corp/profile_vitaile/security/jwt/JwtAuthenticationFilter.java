@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.MDC;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,15 +20,13 @@ import java.io.IOException;
 /**
  * JWT Authentication Filter.
  *
- * <p>This filter is executed once per request and is responsible for:
+ * <p>This filter runs once per request and is responsible for:
  * <ul>
- *     <li>Extracting the JWT token from the Authorization header.</li>
- *     <li>Validating the token using {@link JwtService}.</li>
- *     <li>Loading the user details and setting the authentication in the security context.</li>
+ *   <li>Extracting the JWT from the Authorization header</li>
+ *   <li>Validating the token</li>
+ *   <li>Authenticating the user in Spring Security</li>
+ *   <li>Populating MDC context (traceId, userId, endpoint) for logging</li>
  * </ul>
- *
- * <p>If the token is missing, invalid, or expired, the filter simply continues the chain
- * without authenticating the user.
  */
 @Component
 @RequiredArgsConstructor
@@ -36,13 +35,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
-    /**
-     * Executes the JWT validation and authentication logic for each HTTP request.
-     *
-     * @param request  Incoming HTTP request.
-     * @param response Outgoing HTTP response.
-     * @param filterChain Spring Security filter chain to continue execution.
-     */
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -50,43 +42,55 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        final String authHeader = request.getHeader("Authorization");
+        try {
+            final String authHeader = request.getHeader("Authorization");
 
-        // 1. Validate Authorization header format
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        // 2. Extract token and email
-        final String token = authHeader.substring(7);
-        final String userEmail = jwtService.getEmailFromToken(token);
-
-        // 3. Authenticate only if the user is not already authenticated
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
-
-            // 4. Validate the token
-            if (jwtService.isTokenValid(token, userDetails)) {
-
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
-                        );
-
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-
-                // 5. Save the authentication inside the SecurityContext
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            // 1. Validate Authorization header
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                filterChain.doFilter(request, response);
+                return;
             }
-        }
 
-        // 6. Continue the filter chain
-        filterChain.doFilter(request, response);
+            // 2. Extract token & email
+            final String token = authHeader.substring(7);
+            final String userEmail = jwtService.getEmailFromToken(token);
+
+            // 3. Authenticate if not already authenticated
+            if (userEmail != null &&
+                    SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                UserDetails userDetails =
+                        userDetailsService.loadUserByUsername(userEmail);
+
+                if (jwtService.isTokenValid(token, userDetails)) {
+
+                    Integer userId = jwtService.getUserIdFromToken(token);
+
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
+
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource()
+                                    .buildDetails(request)
+                    );
+
+                    SecurityContextHolder.getContext()
+                            .setAuthentication(authToken);
+
+                    // 🔥 MDC CONTEXT FOR LOGGING
+                    MDC.put("userId", String.valueOf(userId));
+                    MDC.put("endpoint", request.getRequestURI());
+                }
+            }
+
+            filterChain.doFilter(request, response);
+
+        } finally {
+            MDC.clear();
+        }
     }
 }
