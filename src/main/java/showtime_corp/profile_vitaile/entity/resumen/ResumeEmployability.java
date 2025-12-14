@@ -1,5 +1,7 @@
 package showtime_corp.profile_vitaile.entity.resumen;
 
+import lombok.Data;
+
 import java.util.List;
 
 /**
@@ -9,6 +11,7 @@ import java.util.List;
  * Focuses on market fit, strengths, and improvement areas.
  * </p>
  */
+@Data
 public class ResumeEmployability {
 
     /**

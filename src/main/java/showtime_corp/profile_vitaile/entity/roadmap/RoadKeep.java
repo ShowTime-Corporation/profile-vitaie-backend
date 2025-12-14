@@ -1,5 +1,7 @@
 package showtime_corp.profile_vitaile.entity.roadmap;
 
+import lombok.Data;
+
 import java.util.List;
 
 /**
@@ -9,6 +11,7 @@ import java.util.List;
  * Focuses on habits, skills, and practices that are already valuable.
  * </p>
  */
+@Data
 public class RoadKeep {
 
     /**
