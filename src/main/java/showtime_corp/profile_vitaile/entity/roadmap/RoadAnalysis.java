@@ -1,5 +1,7 @@
 package showtime_corp.profile_vitaile.entity.roadmap;
 
+import lombok.Data;
+
 import java.util.List;
 
 /**
@@ -9,6 +11,7 @@ import java.util.List;
  * It contains insights about strengths, weaknesses, gaps, and current level.
  * </p>
  */
+@Data
 public class RoadAnalysis {
 
     /**

@@ -1,5 +1,7 @@
 package showtime_corp.profile_vitaile.entity.resumen;
 
+import lombok.Data;
+
 /**
  * Represents a simplified version of AI-generated recommendations to improve the resume.
  * <p>
@@ -7,6 +9,7 @@ package showtime_corp.profile_vitaile.entity.resumen;
  * This version is intended for free users and provides limited feedback.
  * </p>
  */
+@Data
 public class ResumeSimple {
 
     /**

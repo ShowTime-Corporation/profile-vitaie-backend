@@ -1,5 +1,7 @@
 package showtime_corp.profile_vitaile.entity.roadmap;
 
+import lombok.Data;
+
 import java.util.List;
 
 /**
@@ -9,6 +11,7 @@ import java.util.List;
  * Defines objectives and recommendations to improve the user's career path.
  * </p>
  */
+@Data
 public class RoadProposal {
 
     /**

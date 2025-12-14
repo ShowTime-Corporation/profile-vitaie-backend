@@ -1,5 +1,7 @@
 package showtime_corp.profile_vitaile.entity.resumen;
 
+import lombok.Data;
+
 import java.util.List;
 
 /**
@@ -9,6 +11,7 @@ import java.util.List;
  * Includes actionable advice and optimization tips.
  * </p>
  */
+@Data
 public class ResumeRecommendation {
 
     /**
