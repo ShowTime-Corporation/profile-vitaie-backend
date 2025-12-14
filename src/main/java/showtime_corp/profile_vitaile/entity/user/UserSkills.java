@@ -1,5 +1,7 @@
 package showtime_corp.profile_vitaile.entity.user;
 
+import lombok.Data;
+
 import java.util.List;
 
 /**
@@ -9,6 +11,7 @@ import java.util.List;
  * This structure matches the skills section in the user profile UI.
  * </p>
  */
+@Data
 public class UserSkills {
 
     /**

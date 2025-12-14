@@ -1,39 +1,49 @@
-package showtime_corp.profile_vitaile.entity.user;
+    package showtime_corp.profile_vitaile.entity.user;
 
-import java.time.LocalDate;
+    import com.fasterxml.jackson.annotation.JsonFormat;
+    import lombok.Data;
 
-/**
- * Represents a single work experience entry of the user.
- * <p>
- * Stored as a list inside {@code user_experience}.
- * </p>
- */
-public class UserExperience {
+    import java.time.YearMonth;
 
     /**
-     * Job title or position.
+     * Represents a single work experience entry of the user.
+     * <p>
+     * Stored as a list inside {@code user_experience}.
+     * </p>
      */
-    private String role;
+    @Data
+    public class UserExperience {
 
-    /**
-     * Company name.
-     */
-    private String company;
+        /**
+         * Job title or position.
+         */
+        private String role;
 
-    /**
-     * Start date of the position.
-     */
-    private LocalDate startDate;
+        /**
+         * Company name.
+         */
+        private String company;
 
-    /**
-     * End date of the position. Null if current.
-     */
-    private LocalDate endDate;
+        /**
+         * Start date of the position.
+         */
+        @JsonFormat(pattern = "yyyy-MM")
+        private YearMonth startDate;
 
-    /**
-     * Indicates if this is the user's current job.
-     */
-    private boolean current;
+        /**
+         * End date of the position. Null if current.
+         */
+        @JsonFormat(pattern = "yyyy-MM")
+        private YearMonth endDate;
 
+        /**
+         * Indicates if this is the user's current job.
+         */
+        private boolean current;
 
-}
+        /**
+         * Description of responsibilities and achievements in the role.
+         */
+        private String description;
+
+    }

@@ -87,6 +87,17 @@ public class UserProfileServiceImpl implements UserProfileService {
         }
 
         try {
+            // Validate file type (pdf)
+            String contentType = file.getContentType();
+            if (contentType == null || !contentType.equals("application/pdf")) {
+                throw new UnprocessableEntityException("Only PDF files are allowed");
+            }
+
+            // Validate file size (max 10MB)
+            if (file.getSize() > 10 * 1024 * 1024) {
+                throw new UnprocessableEntityException("File size exceeds the maximum limit of 10MB");
+            }
+
             // Directory where CVs will be stored
             String uploadDir = System.getProperty("user.dir") + "/uploads/cv/";
 
@@ -100,7 +111,7 @@ public class UserProfileServiceImpl implements UserProfileService {
             file.transferTo(new File(uploadDir + fileName));
 
             // Store relative path in database
-            user.setPdf("/uploads/cv/" + fileName);
+            user.setPdf("\"/uploads/cv/" + fileName + "\"");
             userRepository.save(user);
 
         } catch (IOException e) {
