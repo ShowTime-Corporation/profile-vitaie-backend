@@ -2,11 +2,11 @@
 FROM maven:3.9.9-amazoncorretto-21 AS build
 WORKDIR /app
 
-# Copiamos pom y cacheamos dependencias
+# Copy pom.xml and cache dependencies
 COPY pom.xml .
 RUN mvn dependency:go-offline
 
-# Copiamos el código y compilamos
+# Copy the source code and build
 COPY src ./src
 RUN mvn clean package -DskipTests
 
@@ -14,12 +14,12 @@ RUN mvn clean package -DskipTests
 FROM amazoncorretto:21-alpine
 WORKDIR /app
 
-# Copiamos el jar
+# Copy the jar file
 COPY --from=build /app/target/*.jar app.jar
 
-# Cloud Run usa PORT
+# Cloud Run uses PORT
 ENV PORT=8080
 EXPOSE 8080
 
-# Ejecutar la app
+# Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
