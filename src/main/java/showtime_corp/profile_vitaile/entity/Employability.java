@@ -1,11 +1,10 @@
 package showtime_corp.profile_vitaile.entity;
 
-import io.hypersistence.utils.hibernate.type.json.JsonType;
+
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Type;
-import showtime_corp.profile_vitaile.entity.employability.Offer;
 
+@Builder
 @Entity
 @Table(name = "employability")
 @Getter
@@ -27,15 +26,12 @@ public class Employability {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @Type(JsonType.class)
-    @Column(name = "tech_offer", nullable = false, columnDefinition = "json")
-    private Offer techOffer;
+    @Column(name = "tech_offer", nullable = false, columnDefinition = "TEXT")
+    private String techOffer;
 
-    @Type(JsonType.class)
-    @Column(name = "education_offer", nullable = false, columnDefinition = "json")
-    private Offer educationOffer;
+    @Column(name = "education_offer", nullable = false, columnDefinition = "TEXT")
+    private String educationOffer;
 
-    @Type(JsonType.class)
-    @Column(name = "company_offer", nullable = false, columnDefinition = "json")
-    private Offer companyOffer;
+    @Column(name = "company_offer", nullable = false, columnDefinition = "TEXT")
+    private String companyOffer;
 }
