@@ -3,7 +3,6 @@ package showtime_corp.profile_vitaile.dto;
 import lombok.Data;
 import showtime_corp.profile_vitaile.entity.user.UserEducation;
 import showtime_corp.profile_vitaile.entity.user.UserExperience;
-import showtime_corp.profile_vitaile.entity.user.UserLinks;
 import showtime_corp.profile_vitaile.entity.user.UserSkills;
 
 import java.util.List;
@@ -19,5 +18,5 @@ public class UserProfileRequestDTO {
     private UserSkills skills;
     private List<UserExperience> experience;
     private List<UserEducation> education;
-    private UserLinks links;
+    private String pdf;
 }

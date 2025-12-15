@@ -5,7 +5,6 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import showtime_corp.profile_vitaile.entity.user.UserEducation;
 import showtime_corp.profile_vitaile.entity.user.UserExperience;
-import showtime_corp.profile_vitaile.entity.user.UserLinks;
 import showtime_corp.profile_vitaile.entity.user.UserSkills;
 
 import java.util.List;
@@ -103,21 +102,8 @@ public class UserRequestDTO {
     private List<UserEducation> education;
 
     @Schema(
-            description = "User social and professional links",
-            example = """
-                    {
-                      "website": "https://portfolio.com/john",
-                      "github": "johnDev",
-                      "linkedin": "john-doe",
-                      "twitter": "john_codes"
-                    }
-                    """
-    )
-    private UserLinks links;
-
-    @Schema(
             description = "Uploaded CV/PDF information",
-            example = "*JSON*"
+            example = "Sample text."
     )
     private String pdf;
 }

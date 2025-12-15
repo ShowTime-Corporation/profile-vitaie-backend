@@ -16,7 +16,6 @@ public interface UserMapper {
     @Mapping(target = "skills", ignore = true)
     @Mapping(target = "experience", ignore = true)
     @Mapping(target = "education", ignore = true)
-    @Mapping(target = "links", ignore = true)
     @Mapping(target = "pdf", ignore = true)
     User fromRegisterRequest(RegisterRequest request);
 }
