@@ -3,12 +3,8 @@ package showtime_corp.profile_vitaile.entity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Type;
-import showtime_corp.profile_vitaile.entity.resumen.ResumeEmployability;
-import showtime_corp.profile_vitaile.entity.resumen.ResumeInfo;
-import showtime_corp.profile_vitaile.entity.resumen.ResumeRecommendation;
-import showtime_corp.profile_vitaile.entity.resumen.ResumeSimple;
 
+@Builder
 @Entity
 @Table(name = "resumen")
 @Getter
@@ -29,19 +25,15 @@ public class Resumen {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @Type(JsonType.class)
-    @Column(name = "resume_info", nullable = false, columnDefinition = "json")
-    private ResumeInfo resumeInfo;
+    @Column(name = "resume_info", nullable = false, columnDefinition = "TEXT")
+    private String resumeInfo;
 
-    @Type(JsonType.class)
-    @Column(name = "resume_employability", nullable = false, columnDefinition = "json")
-    private ResumeEmployability employability;
+    @Column(name = "resume_employability", nullable = false, columnDefinition = "TEXT")
+    private String employability;
 
-    @Type(JsonType.class)
-    @Column(name = "resume_simple", nullable = false, columnDefinition = "json")
-    private ResumeSimple simple;
+    @Column(name = "resume_simple", nullable = false, columnDefinition = "TEXT")
+    private String simple;
 
-    @Type(JsonType.class)
-    @Column(name = "resume_recomendation", nullable = false, columnDefinition = "json")
-    private ResumeRecommendation recommendation;
+    @Column(name = "resume_recomendation", nullable = false, columnDefinition = "TEXT")
+    private String recommendation;
 }

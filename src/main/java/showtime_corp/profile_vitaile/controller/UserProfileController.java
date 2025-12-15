@@ -13,9 +13,20 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import showtime_corp.profile_vitaile.dto.UserProfileRequestDTO;
 import showtime_corp.profile_vitaile.dto.UserProfileResponseDTO;
+import showtime_corp.profile_vitaile.dto.mapper.ResumeMapper;
+import showtime_corp.profile_vitaile.entity.Employability;
+import showtime_corp.profile_vitaile.entity.Resumen;
+import showtime_corp.profile_vitaile.entity.RoadMap;
 import showtime_corp.profile_vitaile.entity.User;
+import showtime_corp.profile_vitaile.repository.EmployabilityRepository;
+import showtime_corp.profile_vitaile.repository.ResumenRepository;
+import showtime_corp.profile_vitaile.repository.RoadMapRepository;
 import showtime_corp.profile_vitaile.repository.UserRepository;
+import showtime_corp.profile_vitaile.service.CvExtractionService;
 import showtime_corp.profile_vitaile.service.UserProfileService;
+import showtime_corp.profile_vitaile.service.serviceai.EmployabilityAiService;
+import showtime_corp.profile_vitaile.service.serviceai.ResumeAiService;
+import showtime_corp.profile_vitaile.service.serviceai.RoadMapAiService;
 
 /**
  * REST controller responsible for managing authenticated user profile data.
@@ -38,6 +49,13 @@ public class UserProfileController {
 
     private final UserProfileService userProfileService;
     private final UserRepository userRepository;
+    private final CvExtractionService extractionService;
+    private final EmployabilityAiService employabilityService;
+    private final RoadMapAiService roadMapService;
+    private final ResumeAiService resumeService;
+    private final ResumenRepository resumeRepository;
+    private final RoadMapRepository roadmapRepository;
+    private final EmployabilityRepository employabilityRepository;
 
     /**
      * Extracts the authenticated user's ID using their email address from {@link Authentication}.
@@ -142,14 +160,50 @@ public class UserProfileController {
             }
     )
     @PostMapping(
-            value = "/me/upload-cv",
+            value = "/analyze/{userId}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public ResponseEntity<UserProfileResponseDTO> uploadCv(
-            Authentication auth,
-            @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Void> analyzeCv(
+            @PathVariable Long userId,
+            @RequestPart("cv") MultipartFile cvPdf
+    ) {
+        User user = userRepository.findById(userId)
+                .orElseThrow();
 
-        Long userId = getUserIdFromAuth(auth); // Change Integer to Long
-        return ResponseEntity.ok(userProfileService.uploadCv(userId, file));
+        String cvText = extractionService.extractText(cvPdf);
+
+        employabilityService.generate(user, cvText);
+        roadMapService.generate(user, cvText);
+        resumeService.generate(user, cvText);
+
+        return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/resume/{userId}")
+    public ResponseEntity<Resumen> getResume(@PathVariable Integer userId) {
+
+        Resumen resume = resumeRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Resume not found"));
+
+        return ResponseEntity.ok(resume);
+    }
+
+    @GetMapping("/roadmap/{userId}")
+    public ResponseEntity<RoadMap> getRoadMap(@PathVariable Integer userId) {
+
+        RoadMap roadMap = roadmapRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Roadmap not found"));
+
+        return ResponseEntity.ok(roadMap);
+    }
+
+    @GetMapping("/employability/{userId}")
+    public ResponseEntity<Employability> getEmployability(@PathVariable Integer userId) {
+
+        Employability employability = employabilityRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Resume not found"));
+
+        return ResponseEntity.ok(employability);
+    }
+
 }

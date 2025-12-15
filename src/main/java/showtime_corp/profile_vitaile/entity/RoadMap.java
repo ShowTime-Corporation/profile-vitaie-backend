@@ -3,12 +3,8 @@ package showtime_corp.profile_vitaile.entity;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Type;
-import showtime_corp.profile_vitaile.entity.roadmap.RoadAnalysis;
-import showtime_corp.profile_vitaile.entity.roadmap.RoadIdeas;
-import showtime_corp.profile_vitaile.entity.roadmap.RoadKeep;
-import showtime_corp.profile_vitaile.entity.roadmap.RoadProposal;
 
+@Builder
 @Entity
 @Table(name = "roadmap")
 @Getter
@@ -30,19 +26,15 @@ public class RoadMap {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @Type(JsonType.class)
-    @Column(name = "road_analisis", nullable = false, columnDefinition = "json")
-    private RoadAnalysis analysis;
+    @Column(name = "road_analisis", nullable = false, columnDefinition = "TEXT")
+    private String analysis;
 
-    @Type(JsonType.class)
-    @Column(name = "road_proposal", nullable = false, columnDefinition = "json")
-    private RoadProposal proposal;
+    @Column(name = "road_proposal", nullable = false, columnDefinition = "TEXT")
+    private String proposal;
 
-    @Type(JsonType.class)
-    @Column(name = "road_ideas", nullable = false, columnDefinition = "json")
-    private RoadIdeas ideas;
+    @Column(name = "road_ideas", nullable = false, columnDefinition = "TEXT")
+    private String ideas;
 
-    @Type(JsonType.class)
-    @Column(name = "road_keep", nullable = false, columnDefinition = "json")
-    private RoadKeep keep;
+    @Column(name = "road_keep", nullable = false, columnDefinition = "TEXT")
+    private String keep;
 }
