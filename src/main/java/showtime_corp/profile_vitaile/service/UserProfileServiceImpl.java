@@ -12,9 +12,9 @@ import showtime_corp.profile_vitaile.exception.ResourceNotFoundException;
 import showtime_corp.profile_vitaile.exception.UnprocessableEntityException;
 import showtime_corp.profile_vitaile.mapper.UserProfileMapper;
 import showtime_corp.profile_vitaile.repository.UserRepository;
-
-import java.io.File;
-import java.io.IOException;
+import showtime_corp.profile_vitaile.service.service_ai.EmployabilityAiService;
+import showtime_corp.profile_vitaile.service.service_ai.ResumeAiService;
+import showtime_corp.profile_vitaile.service.service_ai.RoadMapAiService;
 
 /**
  * Service implementation for managing user profile operations such as retrieving profile data,
@@ -30,6 +30,10 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     private final UserRepository userRepository;
     private final UserProfileMapper userProfileMapper;
+    private final CvExtractionService extractionService;
+    private final EmployabilityAiService employabilityService;
+    private final RoadMapAiService roadMapService;
+    private final ResumeAiService resumeService;
 
     /**
      * Retrieves the profile of a specific user by ID.
@@ -98,23 +102,15 @@ public class UserProfileServiceImpl implements UserProfileService {
                 throw new UnprocessableEntityException("File size exceeds the maximum limit of 10MB");
             }
 
-            // Directory where CVs will be stored
-            String uploadDir = System.getProperty("user.dir") + "/uploads/cv/";
+            // extraction service parses the PDF.
+            String cvText = extractionService.extractText(file);
 
-            File folder = new File(uploadDir);
-            if (!folder.exists() && !folder.mkdirs()) {
-                throw new InternalServerErrorException("Could not create upload directory");
-            }
+            // Then, we call the IA analysis.
+            employabilityService.generate(user, cvText);
+            roadMapService.generate(user, cvText);
+            resumeService.generate(user, cvText);
 
-            // Store file with prefix userId_ to avoid name collisions
-            String fileName = userId + "_" + file.getOriginalFilename();
-            file.transferTo(new File(uploadDir + fileName));
-
-            // Store relative path in database
-            user.setPdf("\"/uploads/cv/" + fileName + "\"");
-            userRepository.save(user);
-
-        } catch (IOException e) {
+        } catch (Error e) {
             log.error("Error uploading CV for user {}: {}", userId, e.getMessage(), e);
             throw new InternalServerErrorException("Failed to upload CV");
         }

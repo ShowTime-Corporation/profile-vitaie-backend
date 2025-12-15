@@ -1,4 +1,4 @@
-package showtime_corp.profile_vitaile.service.serviceai;
+package showtime_corp.profile_vitaile.service.service_ai;
 
 import org.springframework.stereotype.Component;
 
