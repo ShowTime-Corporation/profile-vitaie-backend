@@ -17,55 +17,28 @@ public class RoadMapDTO {
 
     @Schema(
             description = "Professional analysis section",
-            example = """
-                    {
-                      "summary": "Strong backend profile; needs cloud upskilling.",
-                      "strengths": ["Java", "API Design"],
-                      "weaknesses": ["Cloud Architecture"],
-                      "skillGaps": ["Kubernetes", "AWS"],
-                      "currentLevel": "Mid-level"
-                    }
-                    """
+            example = "Current Role: Junior Backend Dev. Goal: Senior Data Scientist in 3 years."
     )
     @NotNull(message = "road_analisis cannot be null")
     private Object road_analisis;
 
     @Schema(
             description = "AI-generated professional proposal",
-            example = """
-                    {
-                      "mainGoal": "Become a Senior Cloud Backend Engineer",
-                      "targetRoles": ["Backend Engineer", "Cloud Engineer"],
-                      "recommendedSkills": ["Terraform", "AWS", "Kubernetes"],
-                      "estimatedTimeline": "6 months"
-                    }
-                    """
+            example = "Phase 1 (6 months): Master Python Data Libraries (Pandas/Numpy). Phase 2: Complete ML Bootcamp."
     )
     @NotNull(message = "road_proposal cannot be null")
     private Object road_proposal;
 
     @Schema(
             description = "AI ideas and recommended actions",
-            example = """
-                    {
-                      "projectIdeas": ["Deploy a serverless API", "Build a cloud-ready microservice"],
-                      "learningActivities": ["AWS labs", "Kubernetes challenge"],
-                      "portfolioIdeas": ["Add cloud case studies"]
-                    }
-                    """
+            example = "Action: Start a side project using live data streams. Idea: Network with Data Leads on LinkedIn."
     )
     @NotNull(message = "road_ideas cannot be null")
     private Object road_ideas;
 
     @Schema(
             description = "Things the user should keep doing",
-            example = """
-                    {
-                      "keepSkills": ["Java", "Clean Code"],
-                      "keepHabits": ["Daily coding"],
-                      "keepTechnologies": ["Spring Boot"]
-                    }
-                    """
+            example = "Continue contributing to Open Source projects (GitHub). Maintain weekly study schedule (10h)."
     )
     @NotNull(message = "road_keep cannot be null")
     private Object road_keep;

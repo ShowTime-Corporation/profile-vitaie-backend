@@ -20,42 +20,21 @@ public class EmployabilityDTO {
 
     @Schema(
             description = "Tech-related employability analysis",
-            example = """
-                    {
-                      "roles": ["Backend Developer", "DevOps Engineer"],
-                      "requiredSkills": ["Java", "Docker", "Kubernetes"],
-                      "technologies": ["AWS", "PostgreSQL"],
-                      "demandLevel": "High"
-                    }
-                    """
+            example = "Compatible with Full Stack (Python/React) 85%. Salary range: 40k-50k USD."
     )
     @NotNull(message = "tech_offer cannot be null")
     private Object tech_offer;
 
     @Schema(
             description = "Education recommendations from AI",
-            example = """
-                    {
-                      "courses": ["AWS Cloud Practitioner", "Kubernetes Bootcamp"],
-                      "certifications": ["AWS CCP", "CKA"],
-                      "platforms": ["Udemy", "Coursera"],
-                      "estimatedDuration": "3 months"
-                    }
-                    """
+            example = "Recommendation: AWS Cloud Certification. Gap: Lack of Kubernetes experience."
     )
     @NotNull(message = "education_offer cannot be null")
     private Object education_offer;
 
     @Schema(
             description = "Company and market recommendations",
-            example = """
-                    {
-                      "companies": ["Globant", "Rappi"],
-                      "sectors": ["Fintech", "Cloud"],
-                      "workModels": ["Remote", "Hybrid"],
-                      "benefits": ["Health insurance", "Education stipend"]
-                    }
-                    """
+            example = "Recommended: Fintech companies (Nubank). Trend: High demand in AI/ML."
     )
     @NotNull(message = "company_offer cannot be null")
     private Object company_offer;

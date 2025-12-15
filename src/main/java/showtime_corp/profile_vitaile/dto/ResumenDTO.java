@@ -17,57 +17,28 @@ public class ResumenDTO {
 
     @Schema(
             description = "Resume info",
-            example = """
-                    {
-                      "title": "Backend Engineer",
-                      "summary": "Backend developer with Spring and microservices experience.",
-                      "skills": ["Java", "Spring Boot", "Docker"],
-                      "experience": ["Developed APIs", "Optimized microservices"],
-                      "education": ["Software Engineering - UdeA"]
-                    }
-                    """
+            example = "Extracted keywords: Python, AWS, SQL, Project Management. Experience: 5 years."
     )
     @NotNull(message = "resume_info cannot be null")
     private Object resume_info;
 
     @Schema(
             description = "Employability analysis for the resume",
-            example = """
-                    {
-                      "employabilityLevel": "Mid-level",
-                      "strengths": ["Clean code", "Microservices"],
-                      "weaknesses": ["Cloud"],
-                      "improvementSuggestions": ["Add measurable achievements"]
-                    }
-                    """
+            example = "Match rate: 80% for Data Analyst roles. Weakness: Lack of soft skills section."
     )
     @NotNull(message = "resume_employability cannot be null")
     private Object resume_employability;
 
     @Schema(
             description = "Simple résumé model",
-            example = """
-                    {
-                      "fullName": "John Doe",
-                      "role": "Backend Developer",
-                      "shortDescription": "Backend specialist with 4 years of experience.",
-                      "contactInfo": "john@example.com"
-                    }
-                    """
+            example = "Generated model summary: Focused on achievements, not tasks. Uses a chronological format."
     )
     @NotNull(message = "resume_simple cannot be null")
     private Object resume_simple;
 
     @Schema(
             description = "AI-generated improvement recommendations",
-            example = """
-                    {
-                      "generalFeedback": "Good structure but weak impact metrics.",
-                      "contentRecommendations": ["Add achievements"],
-                      "formatRecommendations": ["Improve spacing"],
-                      "atsKeywords": ["REST", "CI/CD", "Microservices"]
-                    }
-                    """
+            example = "Improvement: Quantify 3 achievements in the 'Experience' section. Add a LinkedIn profile URL."
     )
     @NotNull(message = "resume_recomendation cannot be null")
     private Object resume_recomendation;
