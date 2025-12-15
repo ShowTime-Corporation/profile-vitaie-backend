@@ -43,7 +43,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
  * meaning no HTTP session is used to store authentication state.
  * </p>
  *
- * @author Santiago Toro y Andres Niebles
+ * @author Santiago Toro, Samuel Monsalve y Andres Niebles
  * @version 1.0
  */
 @Configuration
@@ -92,10 +92,13 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 "/actuator/health",
-                                "/actuator/prometheus"
-                        ).permitAll()
+                                "/actuator/prometheus")
+                        .permitAll()
 
                         .requestMatchers("/actuator/**").hasRole("ADMIN")
+
+                        // Admin Endpoints
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
 
                         // All other routes require authentication
                         .anyRequest().permitAll())

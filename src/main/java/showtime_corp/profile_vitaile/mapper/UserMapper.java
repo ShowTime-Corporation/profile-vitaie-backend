@@ -19,4 +19,12 @@ public interface UserMapper {
     @Mapping(target = "links", ignore = true)
     @Mapping(target = "pdf", ignore = true)
     User fromRegisterRequest(RegisterRequest request);
+
+    @Mapping(target = "user_id", source = "id")
+    @Mapping(target = "first_name", source = "firstName")
+    @Mapping(target = "last_name", source = "lastName")
+    @Mapping(target = "user_email", source = "email")
+    @Mapping(target = "user_sub", source = "sub")
+    @Mapping(target = "user_active", source = "active")
+    showtime_corp.profile_vitaile.dto.UserProfileResponseDTO toUserResponseDTO(User user);
 }

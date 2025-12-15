@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import showtime_corp.profile_vitaile.dto.AdminUserRequestDTO;
-import showtime_corp.profile_vitaile.dto.UserResponseDTO;
+
 import showtime_corp.profile_vitaile.entity.User;
 import showtime_corp.profile_vitaile.exception.ConflictException;
 import showtime_corp.profile_vitaile.exception.ResourceNotFoundException;
-import showtime_corp.profile_vitaile.exception.BadRequestException;
+
 import showtime_corp.profile_vitaile.repository.UserRepository;
 
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * creation, retrieval, updates, and deletion of users.
  * </p>
  *
- * @author Santiago Toro y Andres Niebles
+ * @author Samuel Monsalve
  * @version 1.0
  */
 @Service
@@ -30,6 +30,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final showtime_corp.profile_vitaile.mapper.UserMapper userMapper;
 
     /**
      * Retrieves a list of all registered users.
@@ -37,9 +38,9 @@ public class AdminUserServiceImpl implements AdminUserService {
      * @return a list of user response DTOs
      */
     @Override
-    public List<UserResponseDTO> getAllUsers() {
+    public List<showtime_corp.profile_vitaile.dto.UserProfileResponseDTO> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(this::mapToDTO)
+                .map(userMapper::toUserResponseDTO)
                 .collect(Collectors.toList());
     }
 
@@ -51,10 +52,10 @@ public class AdminUserServiceImpl implements AdminUserService {
      * @throws ResourceNotFoundException if no user is found with the given ID
      */
     @Override
-    public UserResponseDTO getUserById(Long id) {
+    public showtime_corp.profile_vitaile.dto.UserProfileResponseDTO getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-        return mapToDTO(user);
+        return userMapper.toUserResponseDTO(user);
     }
 
     /**
@@ -68,7 +69,7 @@ public class AdminUserServiceImpl implements AdminUserService {
      *                                   another user
      */
     @Override
-    public UserResponseDTO updateUser(Long id, AdminUserRequestDTO request) {
+    public showtime_corp.profile_vitaile.dto.UserProfileResponseDTO updateUser(Long id, AdminUserRequestDTO request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
 
@@ -88,7 +89,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         }
 
         User savedUser = userRepository.save(user);
-        return mapToDTO(savedUser);
+        return userMapper.toUserResponseDTO(savedUser);
     }
 
     /**
@@ -103,28 +104,5 @@ public class AdminUserServiceImpl implements AdminUserService {
             throw new ResourceNotFoundException("User not found with id: " + id);
         }
         userRepository.deleteById(id);
-    }
-
-    private UserResponseDTO mapToDTO(User user) {
-        UserResponseDTO dto = new UserResponseDTO();
-        dto.setUser_id(user.getId());
-        dto.setFirst_name(user.getFirstName());
-        dto.setLast_name(user.getLastName());
-        dto.setUser_email(user.getEmail());
-        // Handling Enum to String conversion safely
-        dto.setUser_sub(user.getSub() != null ? user.getSub().name() : null);
-        dto.setUser_active(user.getActive());
-
-        // Mapping other profile fields available in User entity
-        dto.setDegree(user.getDegree());
-        dto.setLocation(user.getLocation());
-        dto.setYearsOfExperience(user.getYearsOfExperience());
-        dto.setBio(user.getBio());
-        dto.setExperience(user.getExperience()); // Assumed compatible type
-        dto.setEducation(user.getEducation()); // Assumed compatible type
-        dto.setLinks(user.getLinks()); // Assumed compatible type
-        dto.setPdf(user.getPdf());
-
-        return dto;
     }
 }

@@ -79,14 +79,6 @@ public class User implements UserDetails {
     @Column(name = "user_education", columnDefinition = "json")
     private List<UserEducation> education;
 
-    @Type(JsonType.class)
-    @Column(name = "user_link", columnDefinition = "json")
-    private UserLinks links;
-
-    @Type(JsonType.class)
-    @Column(name = "user_pdf", columnDefinition = "json")
-    private String pdf;
-
     // Spring Security UserDetails methods
     @Override
     public String getUsername() {
