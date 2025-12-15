@@ -145,14 +145,15 @@ public class UserProfileController {
             }
     )
     @PostMapping(
-            value = "/analyze/{userId}",
+            value = "/me/upload-cv",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
     public ResponseEntity<Void> analyzeCv(
-            @PathVariable Long userId,
+            Authentication auth,
             @RequestPart("cv") MultipartFile cvPdf
     ) {
 
+        Long userId = getUserIdFromAuth(auth);
         userProfileService.uploadCv(userId,cvPdf);
 
         return ResponseEntity.ok().build();
@@ -180,15 +181,18 @@ public class UserProfileController {
                     )
             }
     )
-    @GetMapping("/resume/{userId}")
+    @GetMapping("/resume")
     public ResponseEntity<Resumen> getResume(
             @Parameter(
                     description = "Unique identifier of the user",
                     required = true,
                     example = "1"
             )
-            @PathVariable Integer userId
+            Authentication auth
     ) {
+
+        Long userId = getUserIdFromAuth(auth);
+
         Resumen resume = resumeRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Resume not found"));
 
@@ -218,15 +222,18 @@ public class UserProfileController {
                     )
             }
     )
-    @GetMapping("/roadmap/{userId}")
+    @GetMapping("/roadmap")
     public ResponseEntity<RoadMap> getRoadMap(
             @Parameter(
                     description = "Unique identifier of the user",
                     required = true,
                     example = "1"
             )
-            @PathVariable Integer userId
+            Authentication auth
     ) {
+
+        Long userId = getUserIdFromAuth(auth);
+
         RoadMap roadMap = roadmapRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Roadmap not found"));
 
@@ -256,15 +263,17 @@ public class UserProfileController {
                     )
             }
     )
-    @GetMapping("/employability/{userId}")
+    @GetMapping("/employability/")
     public ResponseEntity<Employability> getEmployability(
             @Parameter(
                     description = "Unique identifier of the user",
                     required = true,
                     example = "1"
             )
-            @PathVariable Integer userId
+            Authentication auth
     ) {
+
+        Long userId = getUserIdFromAuth(auth);
         Employability employability = employabilityRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Employability not found"));
 

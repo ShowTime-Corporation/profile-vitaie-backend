@@ -7,6 +7,6 @@ import showtime_corp.profile_vitaile.entity.Employability;
 import java.util.Optional;
 
 @Repository
-public interface EmployabilityRepository extends JpaRepository<Employability, Integer> {
-    Optional<Employability> findByUserId(Integer userId);
+public interface EmployabilityRepository extends JpaRepository<Employability, Long> {
+    Optional<Employability> findByUserId(Long userId);
 }
