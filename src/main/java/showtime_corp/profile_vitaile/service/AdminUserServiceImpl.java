@@ -120,7 +120,6 @@ public class AdminUserServiceImpl implements AdminUserService {
         dto.setLocation(user.getLocation());
         dto.setYearsOfExperience(user.getYearsOfExperience());
         dto.setBio(user.getBio());
-        dto.setSkills(user.getSkills()); // Assumed compatible type
         dto.setExperience(user.getExperience()); // Assumed compatible type
         dto.setEducation(user.getEducation()); // Assumed compatible type
         dto.setLinks(user.getLinks()); // Assumed compatible type

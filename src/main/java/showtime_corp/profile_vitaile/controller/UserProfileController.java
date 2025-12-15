@@ -1,6 +1,7 @@
 package showtime_corp.profile_vitaile.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import showtime_corp.profile_vitaile.dto.UserProfileRequestDTO;
 import showtime_corp.profile_vitaile.dto.UserProfileResponseDTO;
-import showtime_corp.profile_vitaile.dto.mapper.ResumeMapper;
 import showtime_corp.profile_vitaile.entity.Employability;
 import showtime_corp.profile_vitaile.entity.Resumen;
 import showtime_corp.profile_vitaile.entity.RoadMap;
@@ -22,11 +22,7 @@ import showtime_corp.profile_vitaile.repository.EmployabilityRepository;
 import showtime_corp.profile_vitaile.repository.ResumenRepository;
 import showtime_corp.profile_vitaile.repository.RoadMapRepository;
 import showtime_corp.profile_vitaile.repository.UserRepository;
-import showtime_corp.profile_vitaile.service.CvExtractionService;
 import showtime_corp.profile_vitaile.service.UserProfileService;
-import showtime_corp.profile_vitaile.service.serviceai.EmployabilityAiService;
-import showtime_corp.profile_vitaile.service.serviceai.ResumeAiService;
-import showtime_corp.profile_vitaile.service.serviceai.RoadMapAiService;
 
 /**
  * REST controller responsible for managing authenticated user profile data.
@@ -49,10 +45,6 @@ public class UserProfileController {
 
     private final UserProfileService userProfileService;
     private final UserRepository userRepository;
-    private final CvExtractionService extractionService;
-    private final EmployabilityAiService employabilityService;
-    private final RoadMapAiService roadMapService;
-    private final ResumeAiService resumeService;
     private final ResumenRepository resumeRepository;
     private final RoadMapRepository roadmapRepository;
     private final EmployabilityRepository employabilityRepository;
@@ -133,13 +125,6 @@ public class UserProfileController {
         return ResponseEntity.ok(userProfileService.updateProfile(userId, dto));
     }
 
-    /**
-     * Uploads a CV file for the authenticated user and updates the profile with the stored CV URL.
-     *
-     * @param auth authentication object containing the logged user's identity
-     * @param file the CV file to upload
-     * @return the updated profile including CV information
-     */
     @Operation(
             summary = "Upload CV",
             description = "Uploads a CV file for the authenticated user and updates their profile.",
@@ -167,43 +152,124 @@ public class UserProfileController {
             @PathVariable Long userId,
             @RequestPart("cv") MultipartFile cvPdf
     ) {
-        User user = userRepository.findById(userId)
-                .orElseThrow();
 
-        String cvText = extractionService.extractText(cvPdf);
-
-        employabilityService.generate(user, cvText);
-        roadMapService.generate(user, cvText);
-        resumeService.generate(user, cvText);
+        userProfileService.uploadCv(userId,cvPdf);
 
         return ResponseEntity.ok().build();
     }
 
+    @Operation(
+            summary = "Get resume by user ID",
+            description = "Returns the AI-generated resume for the specified user.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Resume retrieved successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = Resumen.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Resume not found"
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized"
+                    )
+            }
+    )
     @GetMapping("/resume/{userId}")
-    public ResponseEntity<Resumen> getResume(@PathVariable Integer userId) {
-
+    public ResponseEntity<Resumen> getResume(
+            @Parameter(
+                    description = "Unique identifier of the user",
+                    required = true,
+                    example = "1"
+            )
+            @PathVariable Integer userId
+    ) {
         Resumen resume = resumeRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Resume not found"));
 
         return ResponseEntity.ok(resume);
     }
 
-    @GetMapping("/roadmap/{userId}")
-    public ResponseEntity<RoadMap> getRoadMap(@PathVariable Integer userId) {
 
+    @Operation(
+            summary = "Get roadmap by user ID",
+            description = "Returns the AI-generated career roadmap for the specified user.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Roadmap retrieved successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = RoadMap.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Roadmap not found"
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized"
+                    )
+            }
+    )
+    @GetMapping("/roadmap/{userId}")
+    public ResponseEntity<RoadMap> getRoadMap(
+            @Parameter(
+                    description = "Unique identifier of the user",
+                    required = true,
+                    example = "1"
+            )
+            @PathVariable Integer userId
+    ) {
         RoadMap roadMap = roadmapRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Roadmap not found"));
 
         return ResponseEntity.ok(roadMap);
     }
 
-    @GetMapping("/employability/{userId}")
-    public ResponseEntity<Employability> getEmployability(@PathVariable Integer userId) {
 
+    @Operation(
+            summary = "Get employability analysis by user ID",
+            description = "Returns the AI-generated employability analysis for the specified user.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Employability analysis retrieved successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = Employability.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Employability analysis not found"
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized"
+                    )
+            }
+    )
+    @GetMapping("/employability/{userId}")
+    public ResponseEntity<Employability> getEmployability(
+            @Parameter(
+                    description = "Unique identifier of the user",
+                    required = true,
+                    example = "1"
+            )
+            @PathVariable Integer userId
+    ) {
         Employability employability = employabilityRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Resume not found"));
+                .orElseThrow(() -> new RuntimeException("Employability not found"));
 
         return ResponseEntity.ok(employability);
     }
+
 
 }
