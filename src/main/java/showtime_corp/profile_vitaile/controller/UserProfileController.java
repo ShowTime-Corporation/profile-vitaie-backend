@@ -18,6 +18,7 @@ import showtime_corp.profile_vitaile.entity.Employability;
 import showtime_corp.profile_vitaile.entity.Resumen;
 import showtime_corp.profile_vitaile.entity.RoadMap;
 import showtime_corp.profile_vitaile.entity.User;
+import showtime_corp.profile_vitaile.exception.ResourceNotFoundException;
 import showtime_corp.profile_vitaile.repository.EmployabilityRepository;
 import showtime_corp.profile_vitaile.repository.ResumenRepository;
 import showtime_corp.profile_vitaile.repository.RoadMapRepository;
@@ -194,7 +195,7 @@ public class UserProfileController {
         Long userId = getUserIdFromAuth(auth);
 
         Resumen resume = resumeRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Resume not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Resume not found"));
 
         return ResponseEntity.ok(resume);
     }
@@ -235,7 +236,7 @@ public class UserProfileController {
         Long userId = getUserIdFromAuth(auth);
 
         RoadMap roadMap = roadmapRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Roadmap not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Roadmap not found"));
 
         return ResponseEntity.ok(roadMap);
     }
@@ -275,7 +276,7 @@ public class UserProfileController {
 
         Long userId = getUserIdFromAuth(auth);
         Employability employability = employabilityRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Employability not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Employability not found"));
 
         return ResponseEntity.ok(employability);
     }
