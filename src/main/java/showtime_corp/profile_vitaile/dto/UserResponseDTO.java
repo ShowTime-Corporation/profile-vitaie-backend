@@ -102,22 +102,4 @@ public class UserResponseDTO {
     )
     private List<UserEducation> education;
 
-    @Schema(
-            description = "User social and professional links",
-            example = """
-                    {
-                      "website": "https://portfolio.com/john",
-                      "github": "johnDev",
-                      "linkedin": "john-doe",
-                      "twitter": "john_codes"
-                    }
-                    """
-    )
-    private UserLinks links;
-
-    @Schema(
-            description = "Uploaded CV/PDF information",
-            example = "*JSON*"
-    )
-    private String pdf;
 }
