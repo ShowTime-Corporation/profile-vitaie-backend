@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import showtime_corp.profile_vitaile.dto.AdminUserRequestDTO;
-import showtime_corp.profile_vitaile.dto.UserResponseDTO;
+
 import showtime_corp.profile_vitaile.service.AdminUserService;
 
 import java.util.List;
@@ -28,7 +28,7 @@ import java.util.List;
  * Access is restricted to users with the 'ADMIN' role.
  * </p>
  *
- * @author Santiago Toro y Andres Niebles
+ * @author Samuel Monsalve
  * @version 1.0
  */
 @RestController
@@ -48,12 +48,12 @@ public class AdminUserController {
          */
         @Operation(summary = "List all users", description = "Retrieves a list of all users. Requires ADMIN role.")
         @ApiResponses(value = {
-                        @ApiResponse(responseCode = "200", description = "List of users retrieved successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
+                        @ApiResponse(responseCode = "200", description = "List of users retrieved successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = showtime_corp.profile_vitaile.dto.UserProfileResponseDTO.class))),
                         @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
                         @ApiResponse(responseCode = "403", description = "Forbidden - Requires ADMIN role", content = @Content)
         })
         @GetMapping
-        public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+        public ResponseEntity<List<showtime_corp.profile_vitaile.dto.UserProfileResponseDTO>> getAllUsers() {
                 return ResponseEntity.ok(adminUserService.getAllUsers());
         }
 
@@ -65,13 +65,13 @@ public class AdminUserController {
          */
         @Operation(summary = "Get user by ID", description = "Retrieves detailed information of a specific user. Requires ADMIN role.")
         @ApiResponses(value = {
-                        @ApiResponse(responseCode = "200", description = "User found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
+                        @ApiResponse(responseCode = "200", description = "User found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = showtime_corp.profile_vitaile.dto.UserProfileResponseDTO.class))),
                         @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
                         @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
                         @ApiResponse(responseCode = "403", description = "Forbidden - Requires ADMIN role", content = @Content)
         })
         @GetMapping("/{id}")
-        public ResponseEntity<UserResponseDTO> getUserById(
+        public ResponseEntity<showtime_corp.profile_vitaile.dto.UserProfileResponseDTO> getUserById(
                         @Parameter(description = "ID of the user to retrieve", required = true) @PathVariable Long id) {
                 return ResponseEntity.ok(adminUserService.getUserById(id));
         }
@@ -85,7 +85,7 @@ public class AdminUserController {
          */
         @Operation(summary = "Update user", description = "Updates an existing user's information. Requires ADMIN role.")
         @ApiResponses(value = {
-                        @ApiResponse(responseCode = "200", description = "User updated successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))),
+                        @ApiResponse(responseCode = "200", description = "User updated successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = showtime_corp.profile_vitaile.dto.UserProfileResponseDTO.class))),
                         @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content),
                         @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
                         @ApiResponse(responseCode = "409", description = "Email conflict", content = @Content),
@@ -93,7 +93,7 @@ public class AdminUserController {
                         @ApiResponse(responseCode = "403", description = "Forbidden - Requires ADMIN role", content = @Content)
         })
         @PutMapping("/{id}")
-        public ResponseEntity<UserResponseDTO> updateUser(
+        public ResponseEntity<showtime_corp.profile_vitaile.dto.UserProfileResponseDTO> updateUser(
                         @Parameter(description = "ID of the user to update", required = true) @PathVariable Long id,
                         @Valid @RequestBody AdminUserRequestDTO request) {
                 return ResponseEntity.ok(adminUserService.updateUser(id, request));

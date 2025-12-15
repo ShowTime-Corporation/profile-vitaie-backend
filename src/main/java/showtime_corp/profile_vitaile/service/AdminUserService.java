@@ -1,17 +1,16 @@
 package showtime_corp.profile_vitaile.service;
 
 import showtime_corp.profile_vitaile.dto.AdminUserRequestDTO;
-import showtime_corp.profile_vitaile.dto.UserResponseDTO;
 
 import java.util.List;
 
 public interface AdminUserService {
 
-    List<UserResponseDTO> getAllUsers();
+    List<showtime_corp.profile_vitaile.dto.UserProfileResponseDTO> getAllUsers();
 
-    UserResponseDTO getUserById(Long id);
+    showtime_corp.profile_vitaile.dto.UserProfileResponseDTO getUserById(Long id);
 
-    UserResponseDTO updateUser(Long id, AdminUserRequestDTO request);
+    showtime_corp.profile_vitaile.dto.UserProfileResponseDTO updateUser(Long id, AdminUserRequestDTO request);
 
     void deleteUser(Long id);
 }
