@@ -10,6 +10,7 @@ import showtime_corp.profile_vitaile.entity.User;
 import showtime_corp.profile_vitaile.exception.BadRequestException;
 import showtime_corp.profile_vitaile.exception.ConflictException;
 import showtime_corp.profile_vitaile.exception.ResourceNotFoundException;
+import showtime_corp.profile_vitaile.exception.UnauthorizedException;
 import showtime_corp.profile_vitaile.mapper.UserMapper;
 import showtime_corp.profile_vitaile.repository.UserRepository;
 import showtime_corp.profile_vitaile.security.jwt.JwtService;
@@ -90,7 +91,7 @@ public class AuthService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new BadRequestException("Invalid credentials");
+            throw new UnauthorizedException("Invalid credentials");
         }
 
         // Generate JWT token based on authenticated user
